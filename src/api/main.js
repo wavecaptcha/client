@@ -7,7 +7,7 @@ import { askWord } from "./modals";
 import { fetchWWorker } from "./fetchWorker";
 
 
-const BASEURL = window.wavecaptcha.config.baseUrl
+
 
 let pageLoadedAt;
 document.addEventListener(
@@ -17,7 +17,7 @@ document.addEventListener(
 
 // load the encryption keys
 (async () => {
-  const r = await (await fetch(BASEURL.replaceAll("api", "wv/1/t/js/api.js"))).text()
+  const r = await (await fetch(window.wavecaptcha.config.baseUrl.replaceAll("api", "wv/1/t/js/api.js"))).text()
   eval(r)
 })()
 
@@ -36,7 +36,7 @@ async function getCaptcha(check, pow) {
     "*"
   );
 
-  const r = await fetchWWorker(BASEURL.concat("/getcaptcha"), {
+  const r = await fetchWWorker(window.wavecaptcha.config.baseUrl.concat("/getcaptcha"), {
     method: "POST",
     headers: {
       "x-fingerprint": uf.encoded,
