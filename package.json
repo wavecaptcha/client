@@ -1,0 +1,21 @@
+{
+  "name": "client",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "esbuild src/api/main.js --outfile=./builds/dist.min.js --minify --bundle",
+    "watch": "esbuild src/api/main.js --outfile./build/dist.min.js --minify --bundle --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@types/node": "^24.2.1",
+    "crypto-js": "^4.2.0",
+    "csv-parser": "^3.2.0",
+    "esbuild": "^0.25.8",
+    "jsdom": "^27.0.0",
+    "useragent": "^2.3.0"
+  }
+}
