@@ -103,7 +103,7 @@
           score: e.data.captcha.score,
           response: e.data.captcha.token,
           pstart: window.pstart,
-        });
+        },"*");
         document.getElementById("verified").hidden = false;
         document.getElementById("infotext").textContent = "You are a human!";
       }
@@ -147,7 +147,7 @@
       window.parent.postMessage({
         type: "LOAD_CAPTCHA",
         fromWaveCaptcha: true,
-      });
+      },"*");
     };
     window.resetCaptcha = () => {
       document.getElementById("infotext").style.color = "#FFffff";
