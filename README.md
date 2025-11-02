@@ -13,7 +13,7 @@ window.wavecaptcha.render(
   document.getElementById("captcha"),
   document.getElementById("wvcaptcha-response"), // captcha response token gets added here (set on value)
   // your site key
-  "a251e6c3-f581-4c59-b2ee-e6832e29cd18" (this is just the demo site key)
+  "" 
 );
 ```
 if you don't want to save the token on a input, just put `{value:null}` in the second argument
