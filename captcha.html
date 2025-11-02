@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WaveCaptcha</title>
+  </head>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+    html {
+      overflow: hidden;
+      color: white;
+      border: 1px solid #4f5659;
+      padding: 3px;
+      border-radius: 5px;
+      font-family: "Inter", sans-serif;
+    }
+    footer {
+      text-align: right;
+      position: fixed;
+      bottom: 8px;
+      right: 11px;
+    }
+    footer > a {
+      cursor: pointer;
+      font-size: 8px;
+      font-weight: 500;
+      color: white;
+    }
+    #checkbox {
+      width: 28px;
+      height: 28px;
+      outline: none;
+      border: 1px solid #4f5659;
+      border-radius: 5px;
+      background: none;
+      cursor: pointer;
+    }
+  </style>
+
+  <style>
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 400px;
+      width: 90%;
+    }
+    .hidden {
+      display: none;
+    }
+    .close {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      cursor: pointer;
+    }
+  </style>
+  <script defer>
+    window.addEventListener("message", async (e) => {
+      if (!e.data.fromWaveCaptcha) return;
+      if (e.data.type === "LOADED_CAPTCHA") {
+        if (e.data.captcha?.error) {
+          document.getElementById("infotext").textContent =
+            e.data.captcha.error;
+        }
+        if (e.data.captcha.score)
+          document.getElementById("infotext").textContent =
+            "Score: " +
+            e.data.captcha.score +
+            " WPM" +
+            e.data.captcha.calculations.keyboard?.wpm;
+        if (e.data.captcha.challenge) {
+        }
+      }
+      if (e.data.type === "FINGERPRINT_START") {
+        document.getElementById("infotext").textContent =
+          "Detecting your browser info...";
+      }
+      if (e.data.type === "SOLVING_POW") {
+        document.getElementById("infotext").textContent =
+          "Solving POW (Proof-Of-Work) diffuctly =" + e.data.diffuctly + "...";
+      }
+      if (e.data.type === "GETTING_CAPTCHA") {
+        document.getElementById("infotext").textContent =
+          "Checking if you are a bot...";
+      }
+      if (e.data.type === "CAPTCHA_SOLVED") {
+        window.parent.postMessage({
+          fromWaveCaptcha: true,
+          type: "CAPTCHA_KEY",
+          score: e.data.captcha.score,
+          response: e.data.captcha.token,
+          pstart: window.pstart,
+        });
+        document.getElementById("verified").hidden = false;
+        document.getElementById("infotext").textContent = "You are a human!";
+      }
+      if (e.data.type === "ERROR") {
+        document.getElementById("infotext").style.color = "#FF0000";
+        document.getElementById("infotext").textContent =
+          "error: " + e.data.error;
+      }
+    });
+  </script>
+  <body style="background-color: #1b1d1e">
+    <div style="cursor: pointer">
+      <div style="top: 0; left: 0; display: absolute">
+        <div
+          class="captcha"
+          style="display: flex; text-align: center; align-items: center"
+        >
+          <button id="checkbox">
+            <span id="verified" hidden="true">✔️</span>
+          </button>
+          <p style="margin-left: 15px; font-size: 13px" id="infotext">
+            I'm a human.
+          </p>
+        </div>
+      </div>
+      <footer>
+        <button onclick="resetCaptcha()">Reset captcha</button>
+        <a>Privacy & policy</a>
+        <a>Terms of service</a>
+      </footer>
+    </div>
+  </body>
+
+  <script>
+    const loadCaptcha = () => {
+      if (window.pstart) return;
+      document.getElementById("infotext").style.color = "#FFffff";
+      document.querySelector("body div.captcha").style.cursor = "not-allowed";
+      document.querySelector("body div.captcha").disabled = true;
+      window.pstart = performance.now();
+      window.parent.postMessage({
+        type: "LOAD_CAPTCHA",
+        fromWaveCaptcha: true,
+      });
+    };
+    window.resetCaptcha = () => {
+      document.getElementById("infotext").style.color = "#FFffff";
+      document.querySelector("body div.captcha").style.cursor = "pointer";
+      document.querySelector("body div.captcha").disabled = false;
+      delete window.pstart;
+    };
+    document.querySelector("body div.captcha").onclick = loadCaptcha;
+  </script>
+</html>

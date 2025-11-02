@@ -136,6 +136,6 @@ const onSolved = () => null
 window.wavecaptcha = {
   getCaptcha, render, onSolved, config: {
     baseUrl: "https://wavecaptcha.happyendermandev.workers.dev/api",
-    iframeUrl: ""
+    iframeUrl: "https://wavecaptcha-cdn.pages.dev/captcha.html"
   }
 };
