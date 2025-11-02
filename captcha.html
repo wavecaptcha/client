@@ -97,13 +97,16 @@
           "Checking if you are a bot...";
       }
       if (e.data.type === "CAPTCHA_SOLVED") {
-        window.parent.postMessage({
-          fromWaveCaptcha: true,
-          type: "CAPTCHA_KEY",
-          score: e.data.captcha.score,
-          response: e.data.captcha.token,
-          pstart: window.pstart,
-        });
+        window.parent.postMessage(
+          {
+            fromWaveCaptcha: true,
+            type: "CAPTCHA_KEY",
+            score: e.data.captcha.score,
+            response: e.data.captcha.token,
+            pstart: window.pstart,
+          },
+          "*"
+        );
         document.getElementById("verified").hidden = false;
         document.getElementById("infotext").textContent = "You are a human!";
       }
@@ -144,10 +147,13 @@
       document.querySelector("body div.captcha").style.cursor = "not-allowed";
       document.querySelector("body div.captcha").disabled = true;
       window.pstart = Date.now();
-      window.parent.postMessage({
-        type: "LOAD_CAPTCHA",
-        fromWaveCaptcha: true,
-      });
+      window.parent.postMessage(
+        {
+          type: "LOAD_CAPTCHA",
+          fromWaveCaptcha: true,
+        },
+        "*"
+      );
     };
     window.resetCaptcha = () => {
       document.getElementById("infotext").style.color = "#FFffff";
