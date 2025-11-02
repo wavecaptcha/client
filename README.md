@@ -7,7 +7,7 @@ The library used to render the captcha and give challenges to users
 add this to the html head tag
 
 ```html
-<script src="/dist.min.js"></script>
+<script src="https://wavecaptcha-cdn.pages.dev/dist.min.js"></script>
 ```
 
 ### render
