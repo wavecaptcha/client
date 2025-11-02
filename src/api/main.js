@@ -129,7 +129,7 @@ function render(element, responseInput, siteKey) {
     }
     if (e.data.type === "CAPTCHA_KEY") {
       log("info", "Captcha solved, key = " + e.data.response + " score = " + e.data.score)
-      log("info", "Took: " + (performance.now() - e.data.pstart) / 1e3 + " s")
+      log("info", "Took: " + (Date.now() - e.data.pstart) / 1e3 + " s")
       responseInput.value = e.data.response
       window.wavecaptcha.onSolved(e.data.response)
     }
