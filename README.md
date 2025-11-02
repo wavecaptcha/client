@@ -37,3 +37,9 @@ window.wavecaptcha.onSolved = (token) => {
 ```js
 window.wavecaptcha.baseUrl = "new base url";
 ```
+
+### change captcha iframe file location
+
+```js
+window.wavecaptcha.baseUrl = "https://wavecaptcha-cdn.pages.dev/captcha.html";
+```
