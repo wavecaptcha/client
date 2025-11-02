@@ -1,3 +1,5 @@
+import { log } from "../logger";
+
 var sha256 = function sha256(ascii) {
   function rightRotate(value, amount) {
     return (value >>> amount) | (value << (32 - amount));
@@ -134,7 +136,7 @@ class WvPow {
       }
     }
     const timeMs = Date.now() - start
-    log("info", "Took ", (timeMs) / 1e3 + " s to solve pow")
+    log("info", "Took " + (timeMs) / 1e3 + " s to solve pow")
     return {
       tries,
       hash: foundHash,

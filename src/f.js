@@ -1789,7 +1789,7 @@ class Fingerprint {
     props.encoded = btoa(raw);
     this.fp = props
     let end = Date.now()
-    log("info", "Took ", (start - end) / 1e3 + " s to get fingerprint")
+    log("info", "Took " + (start - end) / 1e3 + " s to get fingerprint")
     return props;
   }
 }
