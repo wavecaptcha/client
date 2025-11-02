@@ -103,7 +103,7 @@
           score: e.data.captcha.score,
           response: e.data.captcha.token,
           pstart: window.pstart,
-        },"*");
+        });
         document.getElementById("verified").hidden = false;
         document.getElementById("infotext").textContent = "You are a human!";
       }
@@ -143,14 +143,11 @@
       document.getElementById("infotext").style.color = "#FFffff";
       document.querySelector("body div.captcha").style.cursor = "not-allowed";
       document.querySelector("body div.captcha").disabled = true;
-      window.pstart = performance.now();
-      window.parent.postMessage(
-        {
-          type: "LOAD_CAPTCHA",
-          fromWaveCaptcha: true,
-        },
-        "*"
-      );
+      window.pstart = Date.now();
+      window.parent.postMessage({
+        type: "LOAD_CAPTCHA",
+        fromWaveCaptcha: true,
+      });
     };
     window.resetCaptcha = () => {
       document.getElementById("infotext").style.color = "#FFffff";
