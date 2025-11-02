@@ -133,12 +133,13 @@ class WvPow {
         break;
       }
     }
-
+    const timeMs = Date.now() - start
+    log("info", "Took ", (timeMs) / 1e3 + " s to solve pow")
     return {
       tries,
       hash: foundHash,
       nonce: foundNonce,
-      timeMs: Date.now() - start,
+      timeMs,
     };
   }
 

@@ -1686,6 +1686,7 @@ class Fingerprint {
     if (this.fp) return this.fp
 
     log("info", "Generating fingerprint")
+    let start = Date.now()
     if (typeof window?.wavecaptcha === "object")
       window.wavecaptcha.currentIframe.contentWindow.postMessage(
         {
@@ -1694,6 +1695,7 @@ class Fingerprint {
         },
         "*"
       );
+
     let props = {};
 
     props.httpUserAgent = await this.getUserAgent();
@@ -1786,6 +1788,8 @@ class Fingerprint {
     // provide minimal info to server so not privacy invasive
     props.encoded = btoa(raw);
     this.fp = props
+    let end = Date.now()
+    log("info", "Took ", (start - end) / 1e3 + " s to get fingerprint")
     return props;
   }
 }
