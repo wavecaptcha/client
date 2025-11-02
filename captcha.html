@@ -144,10 +144,13 @@
       document.querySelector("body div.captcha").style.cursor = "not-allowed";
       document.querySelector("body div.captcha").disabled = true;
       window.pstart = performance.now();
-      window.parent.postMessage({
-        type: "LOAD_CAPTCHA",
-        fromWaveCaptcha: true,
-      },"*");
+      window.parent.postMessage(
+        {
+          type: "LOAD_CAPTCHA",
+          fromWaveCaptcha: true,
+        },
+        "*"
+      );
     };
     window.resetCaptcha = () => {
       document.getElementById("infotext").style.color = "#FFffff";

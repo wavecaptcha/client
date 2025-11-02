@@ -124,7 +124,7 @@ function render(element, responseInput, siteKey) {
     // handle events
     if (!e.data?.fromWaveCaptcha) return;
     if (e.data.type === "LOAD_CAPTCHA") {
-      const sendMessge = (m) => iframe.contentWindow.postMessage(m);
+      const sendMessge = (m) => iframe.contentWindow.postMessage(m, "*");
       loadCaptcha(sendMessge);
     }
     if (e.data.type === "CAPTCHA_KEY") {
