@@ -6,6 +6,12 @@ import { decrypt, encrypt } from "./crypto";
 import { askWord } from "./modals";
 import { fetchWWorker } from "./fetchWorker";
 
+window.wavecaptcha = {
+  config: {
+    baseUrl: "https://wavecaptcha.happyendermandev.workers.dev/api",
+    iframeUrl: "https://wavecaptcha-cdn.pages.dev/captcha.html"
+  }
+}
 
 
 
@@ -134,8 +140,5 @@ function render(element, responseInput, siteKey) {
 
 const onSolved = () => null
 window.wavecaptcha = {
-  getCaptcha, render, onSolved, config: {
-    baseUrl: "https://wavecaptcha.happyendermandev.workers.dev/api",
-    iframeUrl: "https://wavecaptcha-cdn.pages.dev/captcha.html"
-  }
+  ...window.wavecaptcha, getCaptcha, render, onSolved
 };
