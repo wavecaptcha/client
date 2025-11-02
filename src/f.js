@@ -1726,17 +1726,10 @@ class Fingerprint {
     }
     props.glInfo = glInfo;
 
+
     for (let i = 0; i < 3; i++) {
-      try {
-        canvasHashes.push(await this.getCanvasHash());
-      } catch {
-        canvasHashes.push("unknown");
-      }
-      try {
-        audioHashes.push(await this.getAudioHash());
-      } catch {
-        audioHashes.push("unknown");
-      }
+      canvasPromises.push(this.getCanvasHash().catch(() => "unknown"));
+      audioPromises.push(this.getAudioHash().catch(() => "unknown"));
     }
     props.browserFunctionsNative = { navigator: {}, window: {} };
     this.check(navigator, props.browserFunctionsNative, "navigator");
