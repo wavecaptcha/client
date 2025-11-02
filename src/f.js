@@ -303,7 +303,7 @@ class Fingerprint {
         if (typeof obj[prop] === "function") {
           saveTo[name][prop] = obj[prop]
             .toString()
-            .includes("{ [native code] }");
+            .includes("[native code]");
         }
       } catch { }
     }
