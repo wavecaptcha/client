@@ -1743,7 +1743,7 @@ class Fingerprint {
     this.check(window, props.browserFunctionsNative, "window");
     props.isTimeZoneFuncModified = !Intl.DateTimeFormat()
       .resolvedOptions.toString()
-      .includes("{ [native code] }");
+      .includes("[native code]");
     props.plugins = [...navigator.plugins];
     props.canvasHash = canvasHashes[2];
     props.audioHash = audioHashes[2];
