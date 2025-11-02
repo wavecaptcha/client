@@ -1695,7 +1695,8 @@ class Fingerprint {
         "*"
       );
     let props = {};
-
+    const canvasHashes = [];
+    const audioHashes = [];
     props.httpUserAgent = await this.getUserAgent();
     props.userAgent = navigator.userAgent;
     props.cookiesEnabled = navigator.cookieEnabled;
@@ -1725,15 +1726,18 @@ class Fingerprint {
     }
     props.glInfo = glInfo;
 
-    const canvasPromises = [];
-    const audioPromises = [];
     for (let i = 0; i < 3; i++) {
-      canvasPromises.push(this.getCanvasHash().catch(() => "unknown"));
-      audioPromises.push(this.getAudioHash().catch(() => "unknown"));
+      try {
+        canvasHashes.push(await this.getCanvasHash());
+      } catch {
+        canvasHashes.push("unknown");
+      }
+      try {
+        audioHashes.push(await this.getAudioHash());
+      } catch {
+        audioHashes.push("unknown");
+      }
     }
-    const canvasHashes = await Promise.all(canvasPromises);
-    const audioHashes = await Promise.all(audioPromises);
-
     props.browserFunctionsNative = { navigator: {}, window: {} };
     this.check(navigator, props.browserFunctionsNative, "navigator");
     this.check(window, props.browserFunctionsNative, "window");
