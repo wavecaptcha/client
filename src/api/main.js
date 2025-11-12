@@ -45,8 +45,8 @@ async function getCaptcha(check, pow) {
   const r = await fetchWWorker(window.wavecaptcha.config.baseUrl.concat("/getcaptcha"), {
     method: "POST",
     headers: {
+      // keeping it to fool people (this doesnt do anything lol)
       "x-fingerprint": uf.encoded,
-      "x-fingerprint-hash": uf.hash,
       "content-type": "application/json",
       "authorization": window.wavecaptcha.siteKey
     },
@@ -55,7 +55,9 @@ async function getCaptcha(check, pow) {
       mm: getMm(), // mouse mouvements
       kb: getKb(), // keyboard speed,
       check: check || false,
-      pow
+      pow,
+      fingerprint: uf.encoded,
+      fingerprintHash: uf.hash
     })),
   });
   let json = JSON.parse(r.body)
