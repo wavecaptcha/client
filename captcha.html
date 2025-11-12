@@ -85,14 +85,17 @@
         }
       }
       if (e.data.type === "FINGERPRINT_START") {
+        document.getElementById("infotext").style.fontSize = "13px";
         document.getElementById("infotext").textContent =
           "Detecting your browser info...";
       }
       if (e.data.type === "SOLVING_POW") {
+        document.getElementById("infotext").style.fontSize = "11px";
         document.getElementById("infotext").textContent =
           "Solving POW (Proof-Of-Work) diffuctly =" + e.data.diffuctly + "...";
       }
       if (e.data.type === "GETTING_CAPTCHA") {
+        document.getElementById("infotext").style.fontSize = "13px";
         document.getElementById("infotext").textContent =
           "Checking if you are a bot...";
       }
@@ -107,10 +110,12 @@
           },
           "*"
         );
+        document.getElementById("infotext").style.fontSize = "13px";
         document.getElementById("verified").hidden = false;
         document.getElementById("infotext").textContent = "You are a human!";
       }
       if (e.data.type === "ERROR") {
+        document.getElementById("infotext").style.fontSize = "13px";
         document.getElementById("infotext").style.color = "#FF0000";
         document.getElementById("infotext").textContent =
           "error: " + e.data.error;

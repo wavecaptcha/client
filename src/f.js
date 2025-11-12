@@ -1681,6 +1681,10 @@ class Fingerprint {
       cryptoSupported: fingerprint.cryptoSupported,
     };
   }
+  async getTLSHashes() {
+    const data = await (await fetch("https://get.ja3.zone")).json()
+    return [data.tls.ja3_hash, data.tls.ja4, data.tls.peetprint_hash, data.http2.akamai_fingerprint_hash]
+  }
   async getProps() {
     if (this.fp) log("info", "Fingerprint found on cache")
     if (this.fp) return this.fp
@@ -1783,6 +1787,8 @@ class Fingerprint {
     props.hashMethod = props.hash.length === 64 ? "sha256" : "md5";
 
     props.cryptoSupported = props.hashMethod === "sha256";
+    // temp fix for ja4, i don't have any way of getting ja4 hash on cf worker sadly
+    props.tlsHashes = await this.getTLSHashes()
     const raw = JSON.stringify(this.minimalFingerprint(props));
 
     // provide minimal info to server so not privacy invasive
