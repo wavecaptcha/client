@@ -1679,6 +1679,7 @@ class Fingerprint {
       maxTouchPoints: fingerprint.maxTouchPoints ?? 0,
       isMobile: fingerprint.isMobile,
       cryptoSupported: fingerprint.cryptoSupported,
+      tlsHashes: fingerprint.tlsHashes
     };
   }
   async getTLSHashes() {
