@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "esbuild src/api/main.js --outfile=./builds/dist.min.js --minify --bundle",
-    "addBuildInfo": "sed -i -e \"s/{VERSION_HASH}/${CF_PAGES_COMMIT_SHA:-dev}/g\" -e \"s/{BUILD_NUMBER}/$(( $(date -u +%s%3N) - 1762088980000 ))/g\" -e \"s/{BUILT_AT}/$(date -u +%Y-%m-%dT%H:%M:%SZ)/g\" ./builds/dist.min.js",
+    "addBuildInfo": "sed -i -e \"s/{VERSION_HASH}/${CF_PAGES_COMMIT_SHA:-dev}/g\" -e \"s/{BUILD_NUMBER}/$(( ($(date -u +%s) - 1762088980) ))/g\" -e \"s/{BUILT_AT}/$(date -u +%Y-%m-%dT%H:%M:%SZ)/g\" ./builds/dist.min.js",
     "watch": "esbuild src/api/main.js --outfile./build/dist.min.js --minify --bundle --watch"
   },
   "keywords": [],
