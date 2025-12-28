@@ -7,6 +7,11 @@ import { askWord } from "./modals";
 import { fetchWWorker } from "./fetchWorker";
 
 window.wavecaptcha = {
+  build: {
+    buildNumber: "{BUILD_NUMBER}",
+    versionHash: "{VERSION_HASH}",
+    builtAt: "{BUILT_AT}"
+  },
   config: {
     baseUrl: "https://wavecaptcha.happyendermandev.workers.dev/api",
     iframeUrl: "https://wavecaptcha-cdn.pages.dev/captcha.html"
@@ -14,6 +19,7 @@ window.wavecaptcha = {
 }
 
 
+log("info", "[BUILD INFO] Release channel: stable".concat(" Build Number: ", "{BUILD_NUMBER}").concat(", Version Hash: ", "{VERSION_HASH}"), false)
 
 let pageLoadedAt;
 document.addEventListener(
