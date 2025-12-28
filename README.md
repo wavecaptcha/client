@@ -43,3 +43,11 @@ window.wavecaptcha.baseUrl = "new base url";
 ```js
 window.wavecaptcha.baseUrl = "https://wavecaptcha-cdn.pages.dev/captcha.html";
 ```
+
+# Deploy on CF pages:
+
+### Build command:
+
+```sh
+npm i && npm run build && npm run addBuildInfo && cp captcha.html ./builds
+```
