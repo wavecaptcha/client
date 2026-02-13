@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "type": "module",
     "scripts": {
-        "build": "esbuild src/api/main.js --outfile=./builds/dist.temp.js --minify --bundle && javascript-obfuscator ./builds/dist.temp.js --output ./builds/dist.min.js --compact true --identifier-names-generator mangled-shuffled --transform-object-keys true --reserved-strings '{VERSION_HASH},{BUILD_NUMBER},{BUILT_AT}' && rm ./builds/dist.temp.js",
+        "build": "esbuild src/api/main.js --outfile=./builds/dist.min.js --minify --bundle",
         "addBuildInfo": "sed -i -e \"s/{VERSION_HASH}/${CF_PAGES_COMMIT_SHA:-dev}/g\" -e \"s/{BUILD_NUMBER}/$(( ($(date -u +%s) - 1762088980) ))/g\" -e \"s/{BUILT_AT}/$(date -u +%Y-%m-%dT%H:%M:%SZ)/g\" ./builds/dist.min.js",
         "watch": "esbuild src/api/main.js --outfile./build/dist.min.js --minify --bundle --watch"
     },
