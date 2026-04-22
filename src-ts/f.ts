@@ -102,7 +102,7 @@ function ii(a, b, c, d, x, s, t) {
 }
 
 function md51(s) {
-    var txt = '';
+    txt = '';
     var n = s.length,
         state = [1732584193, -271733879, -1732584194, 271733878],
         i;
@@ -123,9 +123,25 @@ function md51(s) {
     return state;
 }
 
+/* there needs to be support for Unicode here,
+ * unless we pretend that we can redefine the MD-5
+ * algorithm for multi-byte characters (perhaps
+ * by adding every four 16-bit characters and
+ * shortening the sum to 32 bits). Otherwise
+ * I suggest performing MD-5 as if every character
+ * was two bytes--e.g., 0040 0025 = @%--but then
+ * how will an ordinary MD-5 sum be matched?
+ * There is no way to standardize text to something
+ * like UTF-8 before transformation; speed cost is
+ * utterly prohibitive. The JavaScript standard
+ * itself needs to look at this: it should start
+ * providing access to strings as preformed UTF-8
+ * 8-bit unsigned value arrays.
+ */
 function md5blk(s) {
+    /* I figured global was faster.   */
     var md5blks = [],
-        i;
+        i; /* Andy King said do it this way. */
     for (i = 0; i < 64; i += 4) {
         md5blks[i >> 2] =
             s.charCodeAt(i) +
@@ -168,6 +184,8 @@ if (md5('hello') != '5d41402abc4b2a76b9719d911017c592') {
     }
 }
 async function sha256(message) {
+    // fallback to md5 if sha256 not supported
+    // this is also useful to tell if browser has no crypto support
     if (!crypto?.subtle) return md5(message);
     const msgBuffer = new TextEncoder().encode(message);
 
@@ -194,14 +212,15 @@ class Fingerprint {
 
         let iframeValue;
         let iframeToString;
+        // check against iframe
         const iframe = document.createElement('iframe');
         iframe.style.display = 'none';
         iframe.srcdoc = 'discord';
         document.body.appendChild(iframe);
         iframeValue = iframe.contentWindow.navigator.webdriver;
-        iframeToString = (iframe.contentWindow as any).Function.prototype.toString;
+        iframeToString = iframe.contentWindow.Function.prototype.toString;
         const webDrivergetter = iframeToString.call(props.get);
-        let isStealth = !!(iframe.contentWindow as any).self.get?.toString();
+        let isStealth = !!iframe.contentWindow.self.get?.toString();
         const result = {
             isModified: !webDrivergetter.includes('[native code]'),
             value: currentValue,
@@ -292,16 +311,16 @@ class Fingerprint {
             },
         };
         const result = Object.fromEntries(
-            Object.entries(bots).map(([key]) => [key, false] as [string, boolean])
+            Object.entries(bots).map((e) => [e[0], false]),
         );
         for (let bot in bots) {
             let isBot = false;
-            for (let [k, v] of Object.entries(bots[bot])) {
+            for (let [k, v] of bots) {
                 if (k === 'window') {
-                    isBot = (v as string[]).some((e) => e in window);
+                    isBot = v.some((e) => e in window);
                 }
                 if (k === 'document') {
-                    isBot = (v as string[]).some((e) => e in document);
+                    isBot = v.some((e) => e in document);
                 }
             }
             result[bot] = isBot;
@@ -324,6 +343,8 @@ class Fingerprint {
         return this.hash(data);
     }
     async getAudioHash() {
+        //navigator.mediaDevices?.enumerateDevices?.();
+
         const audioCtx = new AudioContext();
 
         const osc = audioCtx.createOscillator();
@@ -339,7 +360,7 @@ class Fingerprint {
         const freqData = new Float32Array(analyser.frequencyBinCount);
         const sumData = new Float32Array(analyser.frequencyBinCount);
 
-        const frames = 60;
+        const frames = 60; // ~1 second at 60fps
 
         for (let i = 0; i < frames; i++) {
             analyser.getFloatFrequencyData(freqData);
@@ -349,6 +370,7 @@ class Fingerprint {
             await new Promise((r) => setTimeout(r, 16));
         }
 
+        // Average the collected frames
         for (let j = 0; j < sumData.length; j++) {
             sumData[j] /= frames;
         }
@@ -391,11 +413,11 @@ class Fingerprint {
                 )
             )
                 check = true;
-        })(navigator.userAgent || navigator.vendor || (window as any).opera);
+        })(navigator.userAgent || navigator.vendor || window.opera);
         return check;
     }
     async detectAdBlock() {
-        const result: any = {};
+        const result = {};
         try {
             await fetch('https://googlesyndication.com');
             result.urls = false;
@@ -418,7 +440,7 @@ class Fingerprint {
         document.querySelector('body').appendChild(textarea);
         if (textarea.getAttribute('grammarly-editor-plugin'))
             exts.push('Grammarly');
-        if ((window as any).ethereum) exts.push('Ethereum wallet extension');
+        if (window.ethereum) exts.push('Ethereum wallet extension');
         if (window.solana) exts.push('Solana Wallet extension');
         if (window.__VUE_DEVTOOLS_GLOBAL_HOOK__) exts.push('Vue.js devtools');
         if (window.__ngDevTools__) exts.push('Angular Devtools');
@@ -908,13 +930,983 @@ class Fingerprint {
             'Verdana Italic',
             'Webdings',
             'Wingdings',
+            'Aharoni Bold',
+            'Andalus',
+            'Angsana New',
+            'Angsana New Bold',
+            'Angsana New Bold Italic',
+            'Angsana New Italic',
+            'AngsanaUPC',
+            'Arabic Transparent',
+            'Arabic Transparent Bold',
+            'Batang',
+            'BatangChe',
+            'Browallia New',
+            'Browallia New Bold',
+            'Browallia New Bold Italic',
+            'Browallia New Italic',
+            'BrowalliaUPC',
+            'Cordia New',
+            'Cordia New Bold',
+            'Cordia New Bold Italic',
+            'Cordia New Italic',
+            'CordiaUPC',
+            'David',
+            'David Bold',
+            'David Transparent',
+            'DilleniaUPC',
+            'DilleniaUPC Bold',
+            'DilleniaUPC Bold Italic',
+            'DilleniaUPC Italic',
+            'Dotum',
+            'DotumChe',
+            'EucrosiaUPC',
+            'EucrosiaUPC Bold',
+            'EucrosiaUPC Bold Italic',
+            'EucrosiaUPC Italic',
+            'Fixed Miriam Transparent',
+            'FrankRuehl',
+            'FreesiaUPC',
+            'FreesiaUPC Bold',
+            'FreesiaUPC Bold Italic',
+            'FreesiaUPC Italic',
+            'Gulim',
+            'GulimChe',
+            'Gungsuh',
+            'GungsuhChe',
+            'IrisUPC',
+            'IrisUPC Bold',
+            'IrisUPC Bold Italic',
+            'IrisUPC Italic',
+            'JasmineUPC',
+            'JasmineUPC Bold',
+            'JasmineUPC Bold Italic',
+            'JasmineUPC Italic',
+            'KodchiangUPC',
+            'KodchiangUPC Bold',
+            'KodchiangUPC Bold Italic',
+            'KodchiangUPC Italic',
+            'Levenim MT',
+            'Levenim MT Bold',
+            'LilyUPC',
+            'LilyUPC Bold',
+            'LilyUPC Bold Italic',
+            'LilyUPC Italic',
+            'MS Gothic',
+            'MS Mincho',
+            'MS PGothic',
+            'MS PMincho',
+            'MS UI Gothic',
+            'MingLiU',
+            'Miriam',
+            'Miriam Fixed',
+            'Miriam Transparent',
+            'NSimSun',
+            'Narkisim',
+            'PMingLiU',
+            'Rod',
+            'Rod Transparent',
+            'SimHei',
+            'SimSun',
+            'Simplified Arabic',
+            'Simplified Arabic Bold',
+            'Simplified Arabic Fixed',
+            'Traditional Arabic',
+            'Traditional Arabic Bold',
+            'AngsanaUPC Bold',
+            'AngsanaUPC Bold Italic',
+            'AngsanaUPC Italic',
+            'Aparajita',
+            'Aparajita Bold',
+            'Aparajita Bold Italic',
+            'Aparajita Italic',
+            'Arabic Typesetting',
+            'BrowalliaUPC Bold',
+            'BrowalliaUPC Bold Italic',
+            'BrowalliaUPC Italic',
+            'FontAwesome',
+            'Calibri',
+            'Calibri Bold',
+            'Calibri Bold Italic',
+            'Calibri Italic',
+            'Calibri Light',
+            'Calibri Light Italic',
+            'Cambria',
+            'Cambria Bold',
+            'Cambria Bold Italic',
+            'Cambria Italic',
+            'Cambria Math',
+            'Candara',
+            'Candara Bold',
+            'Candara Bold Italic',
+            'Candara Italic',
+            'Consolas',
+            'Consolas Bold',
+            'Consolas Bold Italic',
+            'Consolas Italic',
+            'Constantia',
+            'Constantia Bold',
+            'Constantia Bold Italic',
+            'Constantia Italic',
+            'Corbel',
+            'Corbel Bold',
+            'Corbel Bold Italic',
+            'Corbel Italic',
+            'CordiaUPC Bold',
+            'CordiaUPC Bold Italic',
+            'CordiaUPC Italic',
+            'DFKai-SB',
+            'DaunPenh',
+            'DokChampa',
+            'Ebrima',
+            'Ebrima Bold',
+            'Euphemia',
+            'FangSong',
+            'Gabriola',
+            'Gautami Bold',
+            'Gisha',
+            'Gisha Bold',
+            'Iskoola Pota',
+            'IskoolaPota-Bold',
+            'KaiTi',
+            'Kalinga',
+            'Kalinga Bold',
+            'Kartika',
+            'Kartika Bold',
+            'Khmer UI',
+            'Khmer UI Bold',
+            'Kokila',
+            'Kokila Bold',
+            'Kokila Bold Italic',
+            'Kokila Italic',
+            'Lao UI',
+            'Lao UI Bold',
+            'Latha Bold',
+            'Leelawadee',
+            'Leelawadee Bold',
+            'Malgun Gothic',
+            'Malgun Gothic Bold',
+            'Mangal Bold',
+            'Meiryo',
+            'Meiryo Bold',
+            'Meiryo Bold Italic',
+            'Meiryo Italic',
+            'Meiryo UI',
+            'Meiryo UI Bold',
+            'Meiryo UI Bold Italic',
+            'Meiryo UI Italic',
+            'Microsoft Himalaya',
+            'Microsoft JhengHei',
+            'Microsoft JhengHei Bold',
+            'Microsoft New Tai Lue',
+            'Microsoft New Tai Lue Bold',
+            'Microsoft PhagsPa',
+            'Microsoft PhagsPa Bold',
+            'Microsoft Tai Le',
+            'Microsoft Tai Le Bold',
+            'Microsoft Uighur',
+            'Microsoft YaHei',
+            'Microsoft YaHei Bold',
+            'Microsoft Yi Baiti',
+            'MingLiU-ExtB',
+            'MingLiU_HKSCS',
+            'MingLiU_HKSCS-ExtB',
+            'Mongolian Baiti',
+            'MoolBoran',
+            'Nyala',
+            'PMingLiU-ExtB',
+            'Raavi Bold',
+            'Sakkal Majalla',
+            'Sakkal Majalla Bold',
+            'Segoe Print',
+            'Segoe Print Bold',
+            'Segoe Script',
+            'Segoe Script Bold',
+            'Segoe UI',
+            'Segoe UI Bold',
+            'Segoe UI Bold Italic',
+            'Segoe UI Italic',
+            'Segoe UI Light',
+            'Segoe UI Semibold',
+            'Segoe UI Symbol',
+            'Shonar Bangla',
+            'Shonar Bangla Bold',
+            'Shruti Bold',
+            'SimSun-ExtB',
+            'Tunga Bold',
+            'Utsaah',
+            'Utsaah Bold',
+            'Utsaah Bold Italic',
+            'Utsaah Italic',
+            'Vani',
+            'Vani Bold',
+            'Vijaya',
+            'Vijaya Bold',
+            'Vrinda',
+            'Vrinda Bold',
+            'Aldhabi',
+            'Comic Sans MS Bold Italic',
+            'Comic Sans MS Italic',
+            'Gadugi',
+            'Gadugi Bold',
+            'Iskoola Pota Bold',
+            'Microsoft JhengHei UI',
+            'Microsoft JhengHei UI Bold',
+            'Microsoft Uighur Bold',
+            'Microsoft YaHei UI',
+            'Microsoft YaHei UI Bold',
+            'Myanmar Text',
+            'Nirmala UI',
+            'Nirmala UI Bold',
+            'Segoe UI Light Italic',
+            'Segoe UI Semibold Italic',
+            'Segoe UI Semilight',
+            'Segoe UI Semilight Italic',
+            'Urdu Typesetting',
+            '.Helvetica LT MM',
+            '.Times LT MM',
+            'Academy Engraved LET',
+            'AcademyEngravedLetPlain',
+            'Bodoni 72',
+            'Bodoni 72 Oldstyle',
+            'Bodoni 72 Smallcaps',
+            'Bodoni Ornaments',
+            'BodoniOrnamentsITCTT',
+            'BodoniSvtyTwoITCTT-Bold',
+            'BodoniSvtyTwoITCTT-Book',
+            'BodoniSvtyTwoITCTT-BookIta',
+            'BodoniSvtyTwoOSITCTT-Bold',
+            'BodoniSvtyTwoOSITCTT-Book',
+            'BodoniSvtyTwoOSITCTT-BookIt',
+            'BodoniSvtyTwoSCITCTT-Book',
+            'Bradley Hand',
+            'BradleyHandITCTT-Bold',
+            'DB LCD Temp',
+            'Kailasa-Bold',
+            'Party LET',
+            'PartyLetPlain',
+            'Avenir Black',
+            'Avenir Black Oblique',
+            'Avenir Book',
+            'Avenir Heavy',
+            'Avenir Light',
+            'Avenir Medium',
+            'Avenir Next Condensed Demi Bold',
+            'Avenir Next Condensed Heavy',
+            'Avenir Next Condensed Medium',
+            'Avenir Next Condensed Ultra Light',
+            'Avenir Next Demi Bold',
+            'Avenir Next Heavy',
+            'Avenir Next Medium',
+            'Avenir Next Ultra Light',
+            'Helvetica Bold',
+            'Helvetica Bold Oblique',
+            'Helvetica Light',
+            'Helvetica Neue Bold Italic',
+            'Helvetica Neue Light Italic',
+            'Helvetica Oblique',
+            'Hiragino Kaku Gothic ProN W3',
+            'Hiragino Kaku Gothic ProN W6',
+            'Hiragino Mincho ProN W3',
+            'Hiragino Mincho ProN W6',
+            'DamascusLight',
+            'Kohinoor Devanagari',
+            'KohinoorDevanagari-Light',
+            '-apple-system',
+            'Charter Black',
+            'HiraginoSans-W3',
+            'HiraginoSans-W6',
+            'KohinoorBangla-Light',
+            'KohinoorBangla-Regular',
+            'KohinoorBangla-Semibold',
+            'KohinoorDevanagari-Regular',
+            'KohinoorDevanagari-Semibold',
+            'KohinoorTelugu-Light',
+            'KohinoorTelugu-Medium',
+            'KohinoorTelugu-Regular',
+            'Noto Sans Lisu',
+            'Noto Sans Mandaic',
+            'Noto Sans Tagalog',
+            'Noto Sans Tai Viet',
+            'PingFangHK-Light',
+            'PingFangHK-Medium',
+            'PingFangHK-Regular',
+            'PingFangHK-Semibold',
+            'PingFangHK-Thin',
+            'PingFangHK-Ultralight',
+            'PingFangSC-Light',
+            'PingFangSC-Medium',
+            'PingFangSC-Regular',
+            'PingFangSC-Semibold',
+            'PingFangSC-Thin',
+            'PingFangSC-Ultralight',
+            'PingFangTC-Light',
+            'PingFangTC-Medium',
+            'PingFangTC-Regular',
+            'PingFangTC-Semibold',
+            'PingFangTC-Thin',
+            'PingFangTC-Ultralight',
+            'Seravek ExtraLight',
+            'Seravek Light',
+            'Seravek Medium',
+            'System Font',
+            'System Font Bold',
+            'System Font Regular',
+            'Droid Sans',
+            'Goudy',
+            'ITC Stone Serif',
+            'sans-serif-condensed',
+            'sans-serif-light',
+            'sans-serif-thin',
+            'Casual',
+            'sans-serif-black',
+            'sans-serif-condensed-light',
+            'sans-serif-medium',
+            'sans-serif-monospace',
+            'sans-serif-smallcaps',
+            'serif-monospace',
+            'Abyssinica SIL',
+            'Bitstream Charter',
+            'Century Schoolbook L',
+            'Courier 10 Pitch',
+            'DejaVu Sans',
+            'DejaVu Sans Mono',
+            'DejaVu Serif',
+            'Dingbats',
+            'Droid Arabic Naskh',
+            'Droid Sans Armenian',
+            'Droid Sans Ethiopic',
+            'Droid Sans Fallback',
+            'Droid Sans Georgian',
+            'Droid Sans Hebrew',
+            'Droid Sans Japanese',
+            'Droid Sans Mono',
+            'Droid Sans Thai',
+            'Droid Serif',
+            'FreeMono',
+            'FreeSans',
+            'FreeSerif',
+            'Garuda',
+            'KacstArt',
+            'KacstBook',
+            'KacstDecorative',
+            'KacstDigital',
+            'KacstFarsi',
+            'KacstLetter',
+            'KacstNaskh',
+            'KacstOffice',
+            'KacstOne',
+            'KacstPen',
+            'KacstPoster',
+            'KacstQurn',
+            'KacstScreen',
+            'KacstTitle',
+            'KacstTitleL',
+            'Kedage',
+            'Khmer OS',
+            'Khmer OS System',
+            'Kinnari',
+            'LKLUG',
+            'Liberation Mono',
+            'Liberation Sans',
+            'Liberation Sans Narrow',
+            'Liberation Serif',
+            'Lohit Bengali',
+            'Lohit Devanagari',
+            'Lohit Gujarati',
+            'Lohit Punjabi',
+            'Lohit Tamil',
+            'Loma',
+            'Mallige',
+            'Meera',
+            'Mukti Narrow',
+            'NanumBarunGothic',
+            'Nimbus Mono L',
+            'Nimbus Roman No9 L',
+            'Nimbus Sans L',
+            'Norasi',
+            'OpenSymbol',
+            'Padauk',
+            'Padauk Book',
+            'Phetsarath OT',
+            'Pothana2000',
+            'Purisa',
+            'Rachana',
+            'Rekha',
+            'Saab',
+            'Sawasdee',
+            'Standard Symbols L',
+            'TakaoPGothic',
+            'Tibetan Machine Uni',
+            'Tlwg Typist',
+            'Tlwg Typo',
+            'TlwgMono',
+            'TlwgTypewriter',
+            'URW Bookman L',
+            'URW Chancery L',
+            'URW Gothic L',
+            'URW Palladio L',
+            'Ubuntu',
+            'Ubuntu Condensed',
+            'Ubuntu Light',
+            'Ubuntu Medium',
+            'Ubuntu Mono',
+            'Umpush',
+            'Vemana2000',
+            'Waree',
+            'gargi',
+            'mry_KacstQurn',
+            'ori1Uni',
+            'utkal',
+            'AR PL UMing CN',
+            'AR PL UMing HK',
+            'AR PL UMing TW',
+            'AR PL UMing TW MBE',
+            'Caladea',
+            'Cantarell',
+            'Carlito',
+            'Cursor',
+            'DejaVu Sans Condensed',
+            'DejaVu Sans Light',
+            'DejaVu Serif Condensed',
+            'Eeyek Unicode',
+            'Jomolhari',
+            'Khmer OS Content',
+            'Lohit Assamese',
+            'Lohit Kannada',
+            'Lohit Malayalam',
+            'Lohit Oriya',
+            'Lohit Telugu',
+            'Mingzat',
+            'Noto Sans Meetei Mayek',
+            'Noto Sans Tai Tham',
+            'Nuosu SIL',
+            'PakType Naqsh',
+            'Utopia',
+            'VL Gothic',
+            'WenQuanYi Zen Hei',
+            'WenQuanYi Zen Hei Mono',
+            'WenQuanYi Zen Hei Sharp',
+            'C059',
+            'cmex10',
+            'cmmi10',
+            'cmr10',
+            'cmsy10',
+            'D050000L',
+            'DejaVu Math TeX Gyre',
+            'DejaVu Sans,DejaVu Sans Condensed',
+            'DejaVu Sans,DejaVu Sans Light',
+            'DejaVu Serif,DejaVu Serif Condensed',
+            'dsrom10',
+            'esint10',
+            'eufm10',
+            'Hack',
+            'Lato',
+            'Lato,Lato Black',
+            'Lato,Lato Hairline',
+            'Lato,Lato Heavy',
+            'Lato,Lato Light',
+            'Lato,Lato Medium',
+            'Lato,Lato Semibold',
+            'Lato,Lato Thin',
+            'Minecraft',
+            'msam10',
+            'msbm10',
+            'Nimbus Mono PS',
+            'Nimbus Roman',
+            'Nimbus Sans',
+            'Nimbus Sans Narrow',
+            'Noto Color Emoji',
+            'Noto Kufi Arabic',
+            'Noto Looped Lao,Noto Looped Lao Bold',
+            'Noto Looped Lao,Noto Looped Lao Regular',
+            'Noto Looped Lao UI,Noto Looped Lao UI Bold',
+            'Noto Looped Lao UI,Noto Looped Lao UI Regular',
+            'Noto Looped Thai,Noto Looped Thai Bold',
+            'Noto Looped Thai,Noto Looped Thai Regular',
+            'Noto Looped Thai UI,Noto Looped Thai UI Bold',
+            'Noto Looped Thai UI,Noto Looped Thai UI Regular',
+            'Noto Mono',
+            'Noto Music',
+            'Noto Naskh Arabic',
+            'Noto Naskh Arabic UI',
+            'Noto Nastaliq Urdu',
+            'Noto Rashi Hebrew',
+            'Noto Sans',
+            'Noto Sans Adlam',
+            'Noto Sans Adlam Unjoined',
+            'Noto Sans Anatolian Hieroglyphs,Noto Sans AnatoHiero',
+            'Noto Sans Arabic',
+            'Noto Sans Arabic UI',
+            'Noto Sans Armenian',
+            'Noto Sans Avestan',
+            'Noto Sans Balinese',
+            'Noto Sans Bamum',
+            'Noto Sans Bassa Vah',
+            'Noto Sans Batak',
+            'Noto Sans Bengali',
+            'Noto Sans Bengali UI',
+            'Noto Sans Bhaiksuki',
+            'Noto Sans Brahmi',
+            'Noto Sans Buginese',
+            'Noto Sans Buhid',
+            'Noto Sans Canadian Aboriginal,Noto Sans CanAborig',
+            'Noto Sans Carian',
+            'Noto Sans Caucasian Albanian,Noto Sans CaucAlban',
+            'Noto Sans Chakma',
+            'Noto Sans Cham',
+            'Noto Sans Cherokee',
+            'Noto Sans CJK HK',
+            'Noto Sans CJK JP',
+            'Noto Sans CJK KR',
+            'Noto Sans CJK SC',
+            'Noto Sans CJK TC',
+            'Noto Sans Coptic',
+            'Noto Sans Cuneiform',
+            'Noto Sans Cypriot',
+            'Noto Sans Deseret',
+            'Noto Sans Devanagari',
+            'Noto Sans Devanagari UI',
+            'Noto Sans Display',
+            'Noto Sans Duployan',
+            'Noto Sans Egyptian Hieroglyphs,Noto Sans EgyptHiero',
+            'Noto Sans Elbasan',
+            'Noto Sans Elymaic',
+            'Noto Sans Ethiopic',
+            'Noto Sans Georgian',
+            'Noto Sans Glagolitic',
+            'Noto Sans Gothic',
+            'Noto Sans Grantha',
+            'Noto Sans Gujarati',
+            'Noto Sans Gujarati UI',
+            'Noto Sans Gunjala Gondi',
+            'Noto Sans Gurmukhi',
+            'Noto Sans Gurmukhi UI',
+            'Noto Sans Hanifi Rohingya',
+            'Noto Sans Hanunoo',
+            'Noto Sans Hatran',
+            'Noto Sans Hebrew',
+            'Noto Sans Imperial Aramaic,Noto Sans ImpAramaic',
+            'Noto Sans Indic Siyaq Numbers',
+            'Noto Sans Inscriptional Pahlavi,Noto Sans InsPahlavi',
+            'Noto Sans Inscriptional Parthian,Noto Sans InsParthi',
+            'Noto Sans Javanese',
+            'Noto Sans Kaithi',
+            'Noto Sans Kannada',
+            'Noto Sans Kannada UI',
+            'Noto Sans Kayah Li',
+            'Noto Sans Kharoshthi',
+            'Noto Sans Khmer',
+            'Noto Sans Khmer UI',
+            'Noto Sans Khojki',
+            'Noto Sans Khudawadi',
+            'Noto Sans Lao',
+            'Noto Sans Lao UI',
+            'Noto Sans Lepcha',
+            'Noto Sans Limbu',
+            'Noto Sans Linear A',
+            'Noto Sans Linear B',
+            'Noto Sans Lycian',
+            'Noto Sans Lydian',
+            'Noto Sans Mahajani',
+            'Noto Sans Malayalam',
+            'Noto Sans Malayalam UI',
+            'Noto Sans Manichaean',
+            'Noto Sans Marchen',
+            'Noto Sans Masaram Gondi',
+            'Noto Sans Math',
+            'Noto Sans Mayan Numerals',
+            'Noto Sans Medefaidrin',
+            'Noto Sans Mende Kikakui',
+            'Noto Sans Meroitic',
+            'Noto Sans Miao',
+            'Noto Sans Modi',
+            'Noto Sans Mongolian',
+            'Noto Sans Mono',
+            'Noto Sans Mono CJK HK',
+            'Noto Sans Mono CJK JP',
+            'Noto Sans Mono CJK KR',
+            'Noto Sans Mono CJK SC',
+            'Noto Sans Mono CJK TC',
+            'Noto Sans Mro',
+            'Noto Sans Multani',
+            'Noto Sans Myanmar',
+            'Noto Sans Myanmar UI',
+            'Noto Sans Nabataean',
+            'Noto Sans Newa',
+            'Noto Sans New Tai Lue',
+            'Noto Sans NKo',
+            'Noto Sans Nushu',
+            'Noto Sans Ogham',
+            'Noto Sans Ol Chiki',
+            'Noto Sans Old Hungarian,Noto Sans OldHung',
+            'Noto Sans Old Italic',
+            'Noto Sans Old North Arabian,Noto Sans OldNorArab',
+            'Noto Sans Old Permic',
+            'Noto Sans Old Persian',
+            'Noto Sans Old Sogdian',
+            'Noto Sans Old South Arabian,Noto Sans OldSouArab',
+            'Noto Sans Old Turkic',
+            'Noto Sans Oriya',
+            'Noto Sans Oriya UI',
+            'Noto Sans Osage',
+            'Noto Sans Osmanya',
+            'Noto Sans Pahawh Hmong',
+            'Noto Sans Palmyrene',
+            'Noto Sans Pau Cin Hau',
+            'Noto Sans PhagsPa',
+            'Noto Sans Phoenician',
+            'Noto Sans Psalter Pahlavi,Noto Sans PsaPahlavi',
+            'Noto Sans Rejang',
+            'Noto Sans Runic',
+            'Noto Sans Samaritan',
+            'Noto Sans Saurashtra',
+            'Noto Sans Sharada',
+            'Noto Sans Shavian',
+            'Noto Sans Siddham',
+            'Noto Sans SignWriting,Noto Sans SignWrit',
+            'Noto Sans Sinhala',
+            'Noto Sans Sinhala UI',
+            'Noto Sans Sogdian',
+            'Noto Sans Sora Sompeng',
+            'Noto Sans Soyombo',
+            'Noto Sans Sundanese',
+            'Noto Sans Syloti Nagri',
+            'Noto Sans Symbols',
+            'Noto Sans Symbols2',
+            'Noto Sans Syriac',
+            'Noto Sans Tagbanwa',
+            'Noto Sans Tai Le',
+            'Noto Sans Takri',
+            'Noto Sans Tamil',
+            'Noto Sans Tamil Supplement',
+            'Noto Sans Tamil UI',
+            'Noto Sans Telugu',
+            'Noto Sans Telugu UI',
+            'Noto Sans Thaana',
+            'Noto Sans Thai',
+            'Noto Sans Thai UI',
+            'Noto Sans Tifinagh',
+            'Noto Sans Tifinagh Adrar',
+            'Noto Sans Tifinagh Agraw Imazighen',
+            'Noto Sans Tifinagh Ahaggar',
+            'Noto Sans Tifinagh Air',
+            'Noto Sans Tifinagh APT',
+            'Noto Sans Tifinagh Azawagh',
+            'Noto Sans Tifinagh Ghat',
+            'Noto Sans Tifinagh Hawad',
+            'Noto Sans Tifinagh Rhissa Ixa',
+            'Noto Sans Tifinagh SIL',
+            'Noto Sans Tifinagh Tawellemmet',
+            'Noto Sans Tirhuta',
+            'Noto Sans Ugaritic',
+            'Noto Sans Vai',
+            'Noto Sans Wancho',
+            'Noto Sans Warang Citi',
+            'Noto Sans Yi',
+            'Noto Sans Zanabazar Square,Noto Sans Zanabazar',
+            'Noto Serif',
+            'Noto Serif Ahom',
+            'Noto Serif Armenian',
+            'Noto Serif Balinese',
+            'Noto Serif Bengali',
+            'Noto Serif CJK HK',
+            'Noto Serif CJK JP',
+            'Noto Serif CJK KR',
+            'Noto Serif CJK SC',
+            'Noto Serif CJK TC',
+            'Noto Serif Devanagari',
+            'Noto Serif Display',
+            'Noto Serif Dogra',
+            'Noto Serif Ethiopic',
+            'Noto Serif Georgian',
+            'Noto Serif Grantha',
+            'Noto Serif Gujarati',
+            'Noto Serif Gurmukhi',
+            'Noto Serif Hebrew',
+            'Noto Serif Hmong Nyiakeng',
+            'Noto Serif Kannada',
+            'Noto Serif Khmer',
+            'Noto Serif Khojki',
+            'Noto Serif Lao',
+            'Noto Serif Malayalam',
+            'Noto Serif Myanmar',
+            'Noto Serif Sinhala',
+            'Noto Serif Tamil',
+            'Noto Serif Tamil Slanted',
+            'Noto Serif Tangut',
+            'Noto Serif Telugu',
+            'Noto Serif Thai',
+            'Noto Serif Tibetan',
+            'Noto Serif Yezidi',
+            'Noto Traditional Nushu',
+            'P052',
+            'rsfs10',
+            'Standard Symbols PS',
+            'stmary10',
+            'Ubuntu Sans',
+            'Ubuntu Sans Mono',
+            'URW Bookman',
+            'URW Gothic',
+            'wasy10',
+            'Z003',
         ];
-        return fonts;
+        function isFontAvailable(font) {
+            const testString = 'mmmmmmmmmmlli';
+            const baseFonts = ['monospace', 'serif', 'sans-serif'];
+            const testSize = '72px';
+
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            // baseline widths
+            const widths = {};
+            for (const base of baseFonts) {
+                ctx.font = `${testSize} ${base}`;
+                widths[base] = ctx.measureText(testString).width;
+            }
+
+            // now test with custom font
+            ctx.font = `${testSize} "${font}", monospace`;
+            const width = ctx.measureText(testString).width;
+
+            return !baseFonts.some((base) => width === widths[base]);
+        }
+        const result = [];
+        for (let font of fonts) {
+            if (isFontAvailable(font)) result.push(font);
+        }
+        return result;
     }
-    getProps() {
-        return Promise.resolve({});
+    getMath() {
+        const e = Math;
+        const custom = {
+            acoshPf: (x) => e.log(x + e.sqrt(x * x - 1)),
+            asinhPf: (x) => e.log(x + e.sqrt(x * x + 1)),
+            atanhPf: (x) => e.log((1 + x) / (1 - x)) / 2,
+            sinhPf: (x) => (e.exp(x) - 1 / e.exp(x)) / 2,
+            coshPf: (x) => (e.exp(x) + 1 / e.exp(x)) / 2,
+            tanhPf: (x) => (e.exp(2 * x) - 1) / (e.exp(2 * x) + 1),
+            expm1Pf: (x) => e.exp(x) - 1,
+            log1pPf: (x) => e.log(1 + x),
+            powPI: (x) => e.pow(e.PI, x),
+        };
+
+        return {
+            acos: e.acos(0.12312423423423424),
+            acosh: e.acosh(1e308),
+            acoshPf: custom.acoshPf(1e154),
+            asin: e.asin(0.12312423423423424),
+            asinh: e.asinh(1),
+            asinhPf: custom.asinhPf(1),
+            atanh: e.atanh(0.5),
+            atanhPf: custom.atanhPf(0.5),
+            atan: e.atan(0.5),
+            sin: e.sin(-1e300),
+            sinh: e.sinh(1),
+            sinhPf: custom.sinhPf(1),
+            cos: e.cos(10.000000000123),
+            cosh: e.cosh(1),
+            coshPf: custom.coshPf(1),
+            tan: e.tan(-1e300),
+            tanh: e.tanh(1),
+            tanhPf: custom.tanhPf(1),
+            exp: e.exp(1),
+            expm1: e.expm1(1),
+            expm1Pf: custom.expm1Pf(1),
+            log1p: e.log1p(10),
+            log1pPf: custom.log1pPf(10),
+            powPI: custom.powPI(-100),
+        };
+    }
+
+    detectRuntime() {
+        // Browser detection
+        if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+            if ('v8BreakIterator' in Intl) return 'Browser (V8)';
+            if (
+                typeof InternalError === 'function' &&
+                typeof uneval === 'function'
+            )
+                return 'Browser (SpiderMonkey)';
+            if (Intl.Collator.supportedLocalesOf('sr-Latn').length === 0)
+                return 'Browser (JavaScriptCore)';
+            return 'Browser (Unknown engine)';
+        }
+
+        // Web Worker detection
+        if (
+            typeof self !== 'undefined' &&
+            typeof importScripts === 'function'
+        ) {
+            return 'Web Worker';
+        }
+
+        // Server / runtime environments
+        try {
+            if (typeof Deno?.version?.deno !== 'undefined')
+                return 'Deno ' + Deno.version.deno;
+            if (typeof Bun?.version !== 'undefined')
+                return 'Bun ' + Bun.version;
+            if (typeof process?.versions?.node !== 'undefined') {
+                if (
+                    typeof navigator !== 'undefined' &&
+                    navigator.userAgent.includes('jsdom')
+                )
+                    return 'Node.js with jsdom (' + process.versions.node + ')';
+                return 'Node.js ' + process.versions.node;
+            }
+        } catch {}
+
+        return 'Unknown runtime';
+    }
+
+    minimalFingerprint(fingerprint) {
+        return {
+            webdriver: {
+                isHuman: fingerprint.webdriver?.isHuman,
+            },
+            userAgent: fingerprint.userAgent ?? '',
+            userAgentMatches: fingerprint.userAgentMatches,
+            isCanvaHashStable: fingerprint.isCanvaHashStable,
+            isAudioHashStable: fingerprint.isAudioHashStable,
+            browserFunctionsNative: fingerprint.browserFunctionsNative,
+            isTimeZoneFuncModified: fingerprint.isTimeZoneFuncModified,
+            isVM: fingerprint.isVM,
+            plugins: fingerprint.plugins ?? [],
+            maxTouchPoints: fingerprint.maxTouchPoints ?? 0,
+            isMobile: fingerprint.isMobile,
+            cryptoSupported: fingerprint.cryptoSupported,
+            tlsHashes: fingerprint.tlsHashes,
+            hash: fingerprint.hash,
+        };
+    }
+    async getTLSHashes() {
+        const data = await (await fetch('https://get.ja3.zone')).json();
+        return [
+            data.tls.ja3_hash,
+            data.tls.ja4,
+            data.tls.peetprint_hash,
+            data.http2.akamai_fingerprint_hash,
+        ];
+    }
+    async getProps() {
+        if (this.fp) log('info', 'Fingerprint found on cache');
+        if (this.fp) return this.fp;
+
+        log('info', 'Generating fingerprint');
+        let start = Date.now();
+        if (typeof window?.wavecaptcha === 'object')
+            window.wavecaptcha.currentIframe.contentWindow.postMessage(
+                {
+                    type: 'FINGERPRINT_START',
+                    fromWaveCaptcha: true,
+                },
+                '*',
+            );
+
+        let props = {};
+
+        props.httpUserAgent = await this.getUserAgent();
+        props.userAgent = navigator.userAgent;
+        props.cookiesEnabled = navigator.cookieEnabled;
+        props.deviceMemory = navigator.deviceMemory;
+        props.languages = navigator.languages;
+        props.webdriver = await this.testWebDriver(props.httpUserAgent);
+        props.isMobile = this.mobileCheck();
+        props.width = screen.width;
+        props.fonts = this.detectFonts();
+        props.height = screen.height;
+        props.availWidth = screen.availWidth;
+        props.availHeight = screen.availHeight;
+        props.doNotTrack = navigator?.doNotTrack;
+        props.timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        props.userAgentMatches = props.httpUserAgent === props.userAgent;
+        props.runtime = this.detectRuntime();
+
+        const c = document.createElement('canvas');
+        const gl = c.getContext('webgl');
+        let glInfo = {};
+        if (gl) {
+            const ext = gl.getExtension('WEBGL_debug_renderer_info');
+            if (ext) {
+                glInfo.vendor = gl.getParameter(ext.UNMASKED_VENDOR_WEBGL);
+                glInfo.renderer = gl.getParameter(ext.UNMASKED_RENDERER_WEBGL);
+            }
+        }
+        props.glInfo = glInfo;
+
+        const canvasPromises = [];
+        const audioPromises = [];
+        for (let i = 0; i < 3; i++) {
+            canvasPromises.push(this.getCanvasHash().catch(() => 'unknown'));
+            audioPromises.push(this.getAudioHash().catch(() => 'unknown'));
+        }
+        const canvasHashes = await Promise.all(canvasPromises);
+        const audioHashes = await Promise.all(audioPromises);
+
+        props.browserFunctionsNative = { navigator: {}, window: {} };
+        this.check(navigator, props.browserFunctionsNative, 'navigator');
+        this.check(window, props.browserFunctionsNative, 'window');
+        props.isTimeZoneFuncModified = !Intl.DateTimeFormat()
+            .resolvedOptions.toString()
+            .includes('[native code]');
+        props.plugins = [...navigator.plugins];
+        props.canvasHash = canvasHashes[2];
+        props.audioHash = audioHashes[2];
+        props.isCanvaHashStable = this.isEqual(canvasHashes);
+        props.isAudioHashStable = this.isEqual(audioHashes);
+        if (!props.isAudioHashStable) props.audioHash = 'unstable';
+        if (!props.isCanvaHashStable) props.canvasHash = 'unstable';
+        props.maxTouchPoints = navigator.maxTouchPoints;
+        props.audioSimpleRate = new AudioContext().sampleRate;
+        props.mediaDevices = await navigator.mediaDevices.enumerateDevices();
+        props.isChromeInUserAgent =
+            navigator.userAgent.includes('Chrome/') &&
+            navigator.vendor === 'Google Inc.';
+        props.adblocker = await this.detectAdBlock();
+        const VM_RENDERERS = [
+            'Google SwiftShader',
+            'SwiftShader',
+            'Microsoft Basic Render Driver',
+            'llvmpipe',
+            'LLVMpipe',
+            'Software Rasterizer',
+            'WebKit WebGL',
+            'ANGLE (Software Renderer)',
+            'Mesa X11',
+            'VirtualBox Graphics Adapter',
+            'VMware SVGA',
+            'Parallels Graphics Adapter',
+            'QEMU Virtual GPU',
+            'X.Org',
+            'Gallium',
+        ];
+        props.isVM = VM_RENDERERS.some((renderer) =>
+            props.glInfo.renderer.includes(renderer),
+        );
+        // little hack, check for known elements, variables etc
+        props.math = this.getMath();
+        // if no sha256 = uses md5
+        props.hash = await sha256(
+            JSON.stringify(props) + ':' + location.hostname,
+        );
+        props.hashMethod = props.hash.length === 64 ? 'sha256' : 'md5';
+
+        props.cryptoSupported = props.hashMethod === 'sha256';
+        // temp fix for ja4, i don't have any way of getting ja4 hash on cf worker sadly
+        props.tlsHashes = await this.getTLSHashes();
+        const raw = JSON.stringify(this.minimalFingerprint(props));
+
+        // provide minimal info to server so not privacy invasive
+        props.encoded = btoa(raw);
+        this.fp = props;
+        let end = Date.now();
+        log('info', 'Took ' + (start - end) / 1e3 + ' s to get fingerprint');
+        return props;
     }
 }
 
 const fingerprint = new Fingerprint();
+
 export { fingerprint };

@@ -1,4 +1,5 @@
-function fetchWWorker(url, options) {
+// protection from debugging (through request call stack)
+function fetchWWorker(url: string, options) {
     return new Promise((resolve, reject) => {
         const workerCode = `
 self.addEventListener('message', async (ev) => {
@@ -26,4 +27,4 @@ self.addEventListener('message', async (ev) => {
     });
 }
 
-export { fetchWWorker }
+export { fetchWWorker };

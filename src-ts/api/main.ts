@@ -6,6 +6,12 @@ import { decrypt, encrypt } from './crypto';
 import { askWord } from './modals';
 import { fetchWWorker } from './fetchWorker';
 
+declare global {
+    interface Window {
+        wavecaptcha: WaveCaptcha;
+    }
+}
+
 window.wavecaptcha = {
     build: {
         buildNumber: '{BUILD_NUMBER}',
@@ -15,6 +21,13 @@ window.wavecaptcha = {
     config: {
         baseUrl: 'https://wavecaptcha.happyendermandev.workers.dev/api',
         iframeUrl: 'https://wavecaptcha-cdn.pages.dev/captcha.html',
+    },
+    onSolved: () => {},
+    getCaptcha: () => {
+        throw new Error("WaveCaptcha still hasn't finished initializing.");
+    },
+    render: () => {
+        throw new Error("WaveCaptcha still hasn't finished initializing.");
     },
 };
 
@@ -45,8 +58,10 @@ document.addEventListener(
     eval(r);
 })();
 
-async function getCaptcha(check?: boolean, pow?: any) {
-    const uf: any = await fingerprint.getProps();
+async function getCaptcha(check?: boolean, pow?: { c: string; nonce: number }) {
+    // get user fingerprint
+
+    const uf = await fingerprint.getProps();
     console.log(uf);
     window.wavecaptcha.currentIframe.contentWindow.postMessage(
         {
@@ -56,13 +71,13 @@ async function getCaptcha(check?: boolean, pow?: any) {
         '*',
     );
 
-    const r: any = await fetchWWorker(
+    const r = await fetchWWorker(
         window.wavecaptcha.config.baseUrl.concat('/getcaptcha'),
         {
             method: 'POST',
             headers: {
                 // keeping it to fool people (this doesnt do anything lol)
-                'x-fingerprint': (uf as any).encoded,
+                'x-fingerprint': uf.encoded,
                 'content-type': 'application/json',
                 authorization: window.wavecaptcha.siteKey,
             },
@@ -73,20 +88,20 @@ async function getCaptcha(check?: boolean, pow?: any) {
                     kb: getKb(), // keyboard speed,
                     check: check || false,
                     pow,
-                    fingerprint: (uf as any).encoded,
-                    fingerprintHash: (uf as any).hash,
+                    fingerprint: uf.encoded,
+                    fingerprintHash: uf.hash,
                 }),
             ),
         },
     );
-    let json: any = JSON.parse(r.body);
+    let json = JSON.parse(r.body);
     json = JSON.parse(decrypt(json.d));
     console.log(json);
     return json;
 }
 
-async function loadCaptcha(sendMessge: any) {
-    const captcha = await getCaptcha(false);
+async function loadCaptcha(sendMessge) {
+    const captcha = await getCaptcha();
     log('info', 'Getting captcha');
     console.log(captcha);
     if (captcha.error) {
@@ -135,7 +150,11 @@ async function loadCaptcha(sendMessge: any) {
     }
 }
 
-function render(element, responseInput, siteKey) {
+function render(
+    element: HTMLElement,
+    responseInput: HTMLInputElement | { value: any },
+    siteKey: string,
+) {
     window.wavecaptcha.siteKey = siteKey;
     log('info', 'Rendering captcha box');
     const iframe = document.createElement('iframe');

@@ -2,6 +2,7 @@ import CryptoJS from 'crypto-js';
 import { v3 } from 'murmurhash';
 
 const d = (enc) => {
+    // enc is the "shifted base64" string; reverse shift then atob
     let b = '';
     for (let i = 0; i < enc.length; i++) {
         b += String.fromCharCode(enc.charCodeAt(i) - 1);
@@ -9,6 +10,11 @@ const d = (enc) => {
     return atob(b);
 };
 
+/**
+ * Utility to find property by hash in object
+ * @param {*} object
+ * @param {number} hash murmurhash v3
+ */
 function findByHash(object, hash) {
     const props = Object.getOwnPropertyNames(object);
     for (let prop of props) {
@@ -16,6 +22,8 @@ function findByHash(object, hash) {
     }
 }
 
+// obfuscated tokens (shifted-base64 of the real keys)
+// these are hashed properties names so it is harder to find what they are
 const O = {
     K1: 1049180957,
     K2: 2788730333,
@@ -34,7 +42,7 @@ const O = {
     K15: 2514386435,
 };
 
-const dec = (arr) => {
+const dec = (arr: any): number[] => {
     const result = [];
     const t = String.fromCharCode;
     const key = t(
@@ -50,6 +58,7 @@ const dec = (arr) => {
     return result;
 };
 function numberArrayToWordArray(arr) {
+    // produce hex string
     let hex = '';
     for (let b of arr) {
         if (b < 0 || b > 255) throw new Error('bytes must be 0..255');
@@ -74,8 +83,10 @@ function deriveIV(clientArr, serverArr) {
     );
 }
 
-const decrypt = (encrypted: string) => {
-    let keys: any = {};
+type ObfuscatedKeys = { _c3_: number[]; _s3_: number[] };
+
+const decrypt = (encrypted) => {
+    let keys: ObfuscatedKeys = { _c3_: [], _s3_: [] };
     findByHash(
         findByHash(findByHash(findByHash(window, O.K12), O.K13), O.K14),
         O.K15,
@@ -98,8 +109,8 @@ const decrypt = (encrypted: string) => {
         O.K11,
     )(decryptedWA);
 };
-const encrypt = (body: any) => {
-    let keys: any = {};
+const encrypt = (body) => {
+    let keys: ObfuscatedKeys = { _c3_: [], _s3_: [] };
     findByHash(
         findByHash(findByHash(findByHash(window, O.K12), O.K13), O.K14),
         O.K15,
