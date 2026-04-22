@@ -4,6 +4,8 @@
     "type": "module",
     "scripts": {
         "build": "esbuild src/api/main.js --outfile=./builds/dist.min.js --minify --bundle",
+        "build-rs": "rspack build",
+        "watch-rs": "rspack build --watch",
         "addBuildInfo": "sed -i -e \"s/{VERSION_HASH}/${CF_PAGES_COMMIT_SHA:-dev}/g\" -e \"s/{BUILD_NUMBER}/$(( ($(date -u +%s) - 1762088980) ))/g\" -e \"s/{BUILT_AT}/$(date -u +%Y-%m-%dT%H:%M:%SZ)/g\" ./builds/dist.min.js",
         "watch": "esbuild src/api/main.js --outfile./build/dist.min.js --minify --bundle --watch"
     },
@@ -19,5 +21,9 @@
         "jsdom": "^27.0.0",
         "murmurhash": "^2.0.1",
         "useragent": "^2.3.0"
+    },
+    "devDependencies": {
+        "@rspack/cli": "^2.0.0",
+        "typescript": "^6.0.3"
     }
 }
