@@ -315,7 +315,7 @@ class Fingerprint {
         );
         for (let bot in bots) {
             let isBot = false;
-            for (let [k, v] of bots) {
+            for (let [k, v] of Object.entries(bots[bot])) {
                 if (k === 'window') {
                     isBot = v.some((e) => e in window);
                 }
