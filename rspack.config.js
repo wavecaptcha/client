@@ -14,4 +14,30 @@ module.exports = {
   builtins: {
     html: false,
   },
+  module: {
+    rules: [
+      {
+        test: /\.(ts|tsx|js|jsx)$/,
+        exclude: /node_modules/,
+        use: {
+          loader: "builtin:swc-loader",
+          options: {
+            jsc: {
+              parser: {
+                syntax: "typescript",
+              },
+              transform: {
+                react: {
+                  runtime: "automatic",
+                },
+              },
+            },
+          },
+        },
+      },
+    ],
+  },
+  resolve: {
+    extensions: [".ts", ".tsx", ".js", ".jsx", ".json"],
+  },
 };
