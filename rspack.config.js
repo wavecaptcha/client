@@ -14,6 +14,7 @@ module.exports = {
   builtins: {
     html: false,
   },
+  devtool: "source-map",
   module: {
     rules: [
       {
